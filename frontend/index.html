@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Favicon for browser tabs -->
+    <link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/en/thumb/9/9e/University_of_Hyderabad_Logo.png/250px-University_of_Hyderabad_Logo.png" />
+
+    <!-- Apple touch icon for iOS -->
+    <link rel="apple-touch-icon" href="https://upload.wikimedia.org/wikipedia/en/thumb/9/9e/University_of_Hyderabad_Logo.png/250px-University_of_Hyderabad_Logo.png"/>
+
+    <title>Smart Inventory Management System</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+    <script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/inventory.js"></script>
+<script src="js/requests.js"></script>
+<script>
+  const token = localStorage.getItem("token");
+  if (token) showRoleUI(localStorage.getItem("role"));
+</script>
+
+  </body>
+</html>
