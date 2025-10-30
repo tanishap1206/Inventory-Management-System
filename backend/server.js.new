@@ -3,13 +3,9 @@ const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const db = require('./config/db');
-const validateEnv = require('./utils/validateEnv');
 const inventoryRoutes = require('./routes/inventoryRoutes');
 const assetRoutes = require('./routes/assetRoutes');
 const { errorHandler } = require('./utils/errorHandler');
-
-// Validate environment variables
-validateEnv();
 
 const app = express();
 
@@ -67,7 +63,7 @@ async function startServer() {
       console.log('\n🛑 Shutting down gracefully...');
       server.close(async () => {
         try {
-          await db.disconnect();
+          await db.connection.close();
           console.log('📦 Database connection closed.');
           console.log('✅ Server shut down successfully.\n');
           process.exit(0);

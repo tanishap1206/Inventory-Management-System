@@ -1,12 +1,50 @@
 // src/pages/GuestView.jsx
-import React, { useState } from "react";
-import { buildings, inventoryItems, brands, categories } from "../data/dummyData";
+import React, { useState, useEffect } from "react";
+
+const API_URL = 'http://localhost:5000/api';
 
 export default function GuestView() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedBuilding, setSelectedBuilding] = useState("All");
   const [selectedRoom, setSelectedRoom] = useState("All");
   const [selectedBrand, setSelectedBrand] = useState("All");
+  const [buildings, setBuildings] = useState([]);
+  const [inventoryItems, setInventoryItems] = useState([]);
+  const [brands, setBrands] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [buildingsRes, inventoryRes, brandsRes] = await Promise.all([
+          fetch(`${API_URL}/buildings`),
+          fetch(`${API_URL}/inventory`),
+          fetch(`${API_URL}/brands`)
+        ]);
+
+        const buildingsData = await buildingsRes.json();
+        const inventoryData = await inventoryRes.json();
+        const brandsData = await brandsRes.json();
+
+        setBuildings(buildingsData);
+        setInventoryItems(inventoryData);
+        setBrands(brandsData);
+        
+        // Extract unique categories from inventory
+        const uniqueCategories = [...new Set(inventoryData.map(item => item.category))];
+        setCategories(uniqueCategories);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   // Calculate statistics
   const totalItems = inventoryItems.length;

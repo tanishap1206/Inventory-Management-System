@@ -1,10 +1,38 @@
 // src/pages/UserDashboard.jsx
-import React from "react";
-import { userRequests } from "../data/dummyData";
+import React, { useState, useEffect } from "react";
+import { useAuth } from "../context/AuthContext";
+
+const API_URL = 'http://localhost:5000/api';
 
 export default function UserDashboard() {
-  // Filter requests for current user (in a real app, this would be based on actual user)
-  const myRequests = userRequests.filter(request => request.userName === "John Doe");
+  const { currentUser } = useAuth();
+  const [myRequests, setMyRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchRequests = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${API_URL}/user/requests`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch requests');
+        }
+
+        const data = await response.json();
+        setMyRequests(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRequests();
+  }, []);
 
   return (
     <div className="p-6 space-y-6 dark:bg-slate-900 min-h-screen">
@@ -12,7 +40,9 @@ export default function UserDashboard() {
       
       {/* Welcome Section */}
       <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow">
-        <h2 className="text-xl font-semibold mb-2 dark:text-white">Welcome, User </h2>
+        <h2 className="text-xl font-semibold mb-2 dark:text-white">
+          Welcome, {currentUser?.name || 'User'}
+        </h2>
         <p className="text-gray-600 dark:text-gray-400">
           Here's an overview of your inventory requests and available actions.
         </p>
@@ -36,7 +66,7 @@ export default function UserDashboard() {
                 {myRequests.map(request => (
                   <tr key={request.id}>
                     <td className="px-4 py-4 whitespace-nowrap dark:text-white">{request.item}</td>
-                    <td className="px-4 py-4 whitespace-nowrap dark:text-white">{request.requestDate}</td>
+                    <td className="px-4 py-4 whitespace-nowrap dark:text-white">{new Date(request.requestDate).toLocaleDateString()}</td>
                     <td className="px-4 py-4 whitespace-nowrap">
                       <span className={`px-2 py-1 text-xs rounded-full ${
                         request.status === "Pending" ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300" :

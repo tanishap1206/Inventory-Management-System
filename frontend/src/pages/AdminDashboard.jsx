@@ -1,15 +1,52 @@
 // src/pages/AdminDashboard.jsx
-import React from "react";
-import { adminInventory, userRequests } from "../data/dummyData";
+import React, { useState, useEffect } from "react";
+
+const API_URL = 'http://localhost:5000/api';
 
 export default function AdminDashboard() {
+  const [stats, setStats] = useState([]);
+  const [requests, setRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const [statsRes, requestsRes] = await Promise.all([
+          fetch(`${API_URL}/admin/stats`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          }),
+          fetch(`${API_URL}/admin/requests`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          })
+        ]);
+
+        const statsData = await statsRes.json();
+        const requestsData = await requestsRes.json();
+
+        setStats([
+          { id: 1, name: 'Total Items', count: statsData.totalItems, description: 'All inventory items', icon: '📦' },
+          { id: 2, name: 'Active Requests', count: statsData.activeRequests, description: 'Pending approvals', icon: '📋' },
+          { id: 3, name: 'Low Stock', count: statsData.lowStock, description: 'Items below threshold', icon: '⚠️' }
+        ]);
+        setRequests(requestsData);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
   return (
     <div className="p-6 space-y-6 dark:bg-slate-900 min-h-screen">
       <h1 className="text-2xl font-bold dark:text-white">Admin Dashboard</h1>
       
       {/* Admin Inventory Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {adminInventory.map(item => (
+        {stats.map(item => (
           <div key={item.id} className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow">
             <div className="flex items-center justify-between">
               <div>
@@ -39,11 +76,11 @@ export default function AdminDashboard() {
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
-              {userRequests.map(request => (
+              {requests.map(request => (
                 <tr key={request.id}>
                   <td className="px-4 py-4 whitespace-nowrap dark:text-white">{request.userName}</td>
                   <td className="px-4 py-4 whitespace-nowrap dark:text-white">{request.item}</td>
-                  <td className="px-4 py-4 whitespace-nowrap dark:text-white">{request.requestDate}</td>
+                  <td className="px-4 py-4 whitespace-nowrap dark:text-white">{new Date(request.requestDate).toLocaleDateString()}</td>
                   <td className="px-4 py-4 whitespace-nowrap">
                     <span className={`px-2 py-1 text-xs rounded-full ${
                       request.status === "Pending" ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300" :

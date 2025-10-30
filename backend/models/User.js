@@ -5,7 +5,7 @@ const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true, index: true },
   passwordHash: { type: String, required: true },
-  role: { type: String, enum: ['admin','staff','guest'], default: 'guest' },
+  role: { type: String, enum: ['admin', 'user', 'staff', 'guest'], default: 'guest' },
   department: String,
   assignedRoom: String, // room id or name
   createdAt: { type: Date, default: Date.now }
