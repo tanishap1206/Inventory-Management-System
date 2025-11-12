@@ -96,7 +96,7 @@ npm install
 ```
 Run frontend
 ```
-npm start
+npm run dev
 ```
 frontend will be running on http://localhost:5173
 
