@@ -87,18 +87,18 @@ Run the backend server:
 ```
 npm start
 ```
-your server will be running on `http://localhost:5000
-```
+your server will be running on http://localhost:5000
+
 Setup the frontend
 ```
-cd ../ims-frontend
+cd ims-frontend
 npm install
-
+```
 Run frontend
 ```
 npm start
 ```
-frontend will be running on `http://localhost:5173
+frontend will be running on http://localhost:5173
 
 Authentication Flow
 
